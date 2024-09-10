@@ -1,11 +1,23 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { nanoid } from "nanoid";
 import Todo from "./components/Todo";
 import Form from "./components/Form";
 import FilterButton from "./components/FilterButton";
 
+const getLocalStorage=(props)=>{
+  let tasks=localStorage.getItem('tasks');
+  console.log(tasks)
+  if(tasks){
+    return JSON.parse(localStorage.getItem('tasks'));
+  }
+  else{
+    return props.tasks
+  }
+}
+
 
 function App(props) {
+  
   const [filter, setFilter] = useState("All");
   const FILTER_MAP = {
   All: () => true,
@@ -50,7 +62,7 @@ const FILTER_NAMES = Object.keys(FILTER_MAP);
   setTasks(editedTaskList);
 }
 
-  const [tasks, setTasks] = useState(props.tasks);
+  const [tasks, setTasks] = useState(getLocalStorage(props));
   const taskList = tasks
   .filter(FILTER_MAP[filter])
   .map((task) => (
@@ -76,6 +88,12 @@ const filterList = FILTER_NAMES.map((name) => (
   const tasksNoun = taskList.length !== 1 ? "tasks" : "task";
   const headingText = `${taskList.length} ${tasksNoun} remaining`;
 
+  useEffect(()=>{
+    localStorage.setItem('tasks',JSON.stringify(tasks))
+  },[tasks])
+
+  
+  
   return (
     <div className="todoapp stack-large">
       <h1>TodoMatic</h1>
